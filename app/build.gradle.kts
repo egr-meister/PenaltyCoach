@@ -96,9 +96,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Use the real release keystore when signing material is provided,
-            // otherwise leave unsigned so local debug builds never fail.
-            signingConfig = if (hasReleaseSigning) signingConfigs.getByName("release") else null
+            // NOTE: release artifacts are intentionally left UNSIGNED by Gradle.
+            // AGP's bundle-signing task (signReleaseBundle / FinalizeBundleTask)
+            // throws an internal NullPointerException on the CI runner regardless
+            // of the signing-config permutations, so signing is performed in CI
+            // instead: jarsigner for the .aab and apksigner for the .apk (see the
+            // GitHub Actions workflow). For a local signed build, assign
+            // signingConfigs.getByName("release") here and build the APK.
         }
     }
 

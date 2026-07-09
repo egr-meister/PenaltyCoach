@@ -1,7 +1,9 @@
 name: Android Release Build
 
-# Fast, stable APK/AAB build + signing verification.
-# No emulator smoke-tests here (kept off free runners on purpose).
+# Builds unsigned release artifacts with Gradle, then signs them directly with
+# jarsigner (.aab) and apksigner (.apk). Signing is done here rather than in AGP
+# because AGP's signReleaseBundle task throws an internal NullPointerException on
+# the CI runner. No emulator smoke-tests are run on the free runners.
 on:
   push:
     branches: [ main ]
@@ -16,13 +18,14 @@ jobs:
 
     env:
       # Signing material comes ONLY from GitHub Secrets. Missing values simply
-      # produce an unsigned build (CI still succeeds) rather than failing.
+      # produce unsigned artifacts (CI still succeeds) rather than failing.
       ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
       # Optional API token. If absent, the app falls back to demo match data.
       FOOTBALL_DATA_API_TOKEN: ${{ secrets.FOOTBALL_DATA_API_TOKEN }}
+      BUILD_TOOLS_VERSION: "35.0.0"
 
     steps:
       - name: Checkout
@@ -67,25 +70,51 @@ jobs:
       - name: Generate Gradle wrapper
         run: gradle wrapper --gradle-version 8.9
 
-      - name: Build signed release AAB
+      - name: Build release AAB (unsigned)
         run: ./gradlew bundleRelease --no-daemon --stacktrace
 
-      - name: Build signed release APK
+      - name: Build release APK (unsigned)
         run: ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Sign release AAB with jarsigner
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        run: |
+          AAB=$(find app/build/outputs/bundle/release -name "*.aab" | head -n 1)
+          if [ -z "$AAB" ]; then echo "No AAB found." >&2; exit 1; fi
+          echo "Signing AAB: $AAB"
+          jarsigner \
+            -keystore "$ANDROID_KEYSTORE_PATH" \
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+            -keypass "$ANDROID_KEY_PASSWORD" \
+            -sigalg SHA256withRSA -digestalg SHA-256 \
+            "$AAB" "$ANDROID_KEY_ALIAS"
+          jarsigner -verify "$AAB" && echo "AAB signature verified."
+
+      - name: Zipalign and sign release APK with apksigner
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        run: |
+          BT="$ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS_VERSION"
+          UNSIGNED=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          if [ -z "$UNSIGNED" ]; then echo "No APK found." >&2; exit 1; fi
+          ALIGNED="app/build/outputs/apk/release/app-release-aligned.apk"
+          SIGNED="app/build/outputs/apk/release/penaltycoach-release.apk"
+          echo "Aligning: $UNSIGNED"
+          "$BT/zipalign" -f -p 4 "$UNSIGNED" "$ALIGNED"
+          echo "Signing APK -> $SIGNED"
+          "$BT/apksigner" sign \
+            --ks "$ANDROID_KEYSTORE_PATH" \
+            --ks-pass "pass:$ANDROID_KEYSTORE_PASSWORD" \
+            --ks-key-alias "$ANDROID_KEY_ALIAS" \
+            --key-pass "pass:$ANDROID_KEY_PASSWORD" \
+            --out "$SIGNED" "$ALIGNED"
 
       - name: Verify release APK signature
         if: env.ANDROID_KEYSTORE_BASE64 != ''
         run: |
-          APK=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
-          if [ -z "$APK" ]; then
-            echo "No release APK found to verify." >&2
-            exit 1
-          fi
-          APKSIGNER="$ANDROID_SDK_ROOT/build-tools/35.0.0/apksigner"
-          echo "Verifying: $APK"
-          CERTS=$("$APKSIGNER" verify --print-certs "$APK")
+          BT="$ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS_VERSION"
+          SIGNED="app/build/outputs/apk/release/penaltycoach-release.apk"
+          CERTS=$("$BT/apksigner" verify --print-certs "$SIGNED")
           echo "$CERTS"
-          # Fail the build if the release artifact was signed with the debug key.
           if echo "$CERTS" | grep -q "CN=Android Debug"; then
             echo "ERROR: Release APK is signed with the debug certificate (CN=Android Debug)." >&2
             exit 1
@@ -96,7 +125,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: penaltycoach-release-apk
-          path: app/build/outputs/apk/release/*.apk
+          path: |
+            app/build/outputs/apk/release/penaltycoach-release.apk
+            app/build/outputs/apk/release/*.apk
           if-no-files-found: warn
 
       - name: Upload release AAB (Google Play upload target)
