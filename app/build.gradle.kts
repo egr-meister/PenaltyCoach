@@ -67,9 +67,13 @@ android {
                 storePassword = keystorePassword
                 this.keyAlias = keyAlias
                 keyPassword = keyPasswordEnv
-                // Let AGP apply default signing versions (V1..V4). Explicitly
-                // setting only V1/V2 leaves V3/V4 null and triggers a
-                // NullPointerException in signReleaseBundle (FinalizeBundleTask).
+                // All four signing-scheme flags must be set explicitly. On AGP 8.6
+                // leaving any of them null makes signReleaseBundle (FinalizeBundleTask)
+                // throw a NullPointerException when unboxing the flag.
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+                enableV4Signing = true
             }
         }
     }
