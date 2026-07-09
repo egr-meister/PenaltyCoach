@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive icon foreground: a dark football goal split into a 3x3 zone grid with
+  a white penalty spot below. Sits on the orange @color/ic_launcher_background.
+  Built entirely from vector paths — no bitmaps, no external assets.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Goal board (dark frame fill) -->
+    <path
+        android:pathData="M24,26 L84,26 L84,66 L24,66 Z"
+        android:fillColor="#111111" />
+
+    <!-- Net grid lines (white) -->
+    <path android:pathData="M44,26 L44,66" android:strokeColor="#FFFFFF" android:strokeWidth="2" />
+    <path android:pathData="M64,26 L64,66" android:strokeColor="#FFFFFF" android:strokeWidth="2" />
+    <path android:pathData="M24,40 L84,40" android:strokeColor="#FFFFFF" android:strokeWidth="2" />
+    <path android:pathData="M24,53 L84,53" android:strokeColor="#FFFFFF" android:strokeWidth="2" />
+
+    <!-- One highlighted target zone (top-right) in brand orange -->
+    <path
+        android:pathData="M66,28 L82,28 L82,38 L66,38 Z"
+        android:fillColor="#FF6200" />
+
+    <!-- White penalty spot -->
+    <path
+        android:pathData="M49,80 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z"
+        android:fillColor="#FFFFFF" />
+</vector>

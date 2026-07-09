@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base app theme. Compose drives all in-app styling; this only needs to be
+         a light, no-action-bar theme so the window looks right before Compose
+         takes over. -->
+    <style name="Theme.PenaltyCoach" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/deep_orange</item>
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+
+    <!-- Custom splash (backported by androidx.core:core-splashscreen so it works
+         from API 24). Orange background + centered goal mark, then hands off to
+         the main theme. -->
+    <style name="Theme.PenaltyCoach.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.PenaltyCoach</item>
+    </style>
+
+</resources>

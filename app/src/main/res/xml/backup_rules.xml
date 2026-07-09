@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Legacy auto-backup rules (API 24-30). PenaltyCoach only stores local user data
+  in a single DataStore Preferences file; allowing it to back up is harmless and
+  contains no credentials or tokens.
+-->
+<full-backup-content>
+    <include domain="file" path="datastore/" />
+</full-backup-content>

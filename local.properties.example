@@ -1,0 +1,13 @@
+# ---------------------------------------------------------------------------
+# Copy this file to "local.properties" and fill in your own values.
+# NEVER commit the real local.properties file (it is in .gitignore).
+# ---------------------------------------------------------------------------
+
+# Path to your Android SDK (Android Studio sets this automatically).
+sdk.dir=/path/to/Android/sdk
+
+# football-data.org API v4 configuration (secondary Match Schedule feature).
+# Get a free token at https://www.football-data.org/client/register
+# If left as the placeholder / missing, the app falls back to demo match data.
+FOOTBALL_API_BASE_URL=https://api.football-data.org/v4
+FOOTBALL_DATA_API_TOKEN=your_api_token_here

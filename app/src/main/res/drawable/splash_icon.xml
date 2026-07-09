@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash icon shown on the orange splash background. Same goal-zone motif as the
+  launcher icon, sized for the 288x288 splash icon canvas.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="288"
+    android:viewportHeight="288">
+
+    <!-- Goal board -->
+    <path
+        android:pathData="M74,96 L214,96 L214,182 L74,182 Z"
+        android:fillColor="#111111" />
+
+    <!-- Net grid lines -->
+    <path android:pathData="M121,96 L121,182" android:strokeColor="#FFFFFF" android:strokeWidth="4" />
+    <path android:pathData="M168,96 L168,182" android:strokeColor="#FFFFFF" android:strokeWidth="4" />
+    <path android:pathData="M74,125 L214,125" android:strokeColor="#FFFFFF" android:strokeWidth="4" />
+    <path android:pathData="M74,153 L214,153" android:strokeColor="#FFFFFF" android:strokeWidth="4" />
+
+    <!-- Highlighted zone (top-right) -->
+    <path
+        android:pathData="M171,100 L210,100 L210,121 L171,121 Z"
+        android:fillColor="#FF6200" />
+
+    <!-- Penalty spot -->
+    <path
+        android:pathData="M132,214 a12,12 0 1,0 24,0 a12,12 0 1,0 -24,0 Z"
+        android:fillColor="#FFFFFF" />
+</vector>

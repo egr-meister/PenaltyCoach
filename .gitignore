@@ -1,0 +1,28 @@
+# --- Secrets / local config (NEVER commit) ---
+local.properties
+*.p12
+*.jks
+*.keystore
+keystore.properties
+
+# --- Gradle / build ---
+.gradle/
+build/
+/app/build/
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# --- Android Studio / IntelliJ ---
+.idea/
+*.iml
+.DS_Store
+/local.properties
+
+# --- Kotlin ---
+.kotlin/
+
+# --- Logs ---
+*.log
