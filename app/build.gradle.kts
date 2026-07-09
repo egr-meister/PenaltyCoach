@@ -67,6 +67,10 @@ android {
                 storePassword = keystorePassword
                 this.keyAlias = keyAlias
                 keyPassword = keyPasswordEnv
+                // Required for AAB signing: the bundle-signing task builds the
+                // KeyStore via KeyStore.getInstance(storeType); a null storeType
+                // (unset) causes a NullPointerException for a .p12 keystore.
+                storeType = "PKCS12"
                 // All four signing-scheme flags must be set explicitly. On AGP 8.6
                 // leaving any of them null makes signReleaseBundle (FinalizeBundleTask)
                 // throw a NullPointerException when unboxing the flag.
